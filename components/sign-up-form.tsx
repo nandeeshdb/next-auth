@@ -9,6 +9,39 @@ import {
 } from "@heroicons/react/16/solid";
 import { Button, Checkbox, Input } from "@nextui-org/react";
 import React, { useState } from "react";
+import validator from "validator";
+import { z } from "zod";
+
+const formSchema = z
+  .object({
+    firstName: z
+      .string()
+      .min(2, "Atleast 2 cahracters required")
+      .max(50, "Only 50characters are allowed")
+      .regex(new RegExp("^[a-zA-Z]$", "Special Characters are not allowed")),
+    lastName: z
+      .string()
+      .min(2, "Atleast 2 cahracters required")
+      .max(50, "Only 50characters are allowed")
+      .regex(new RegExp("^[a-zA-Z]$", "Special Characters are not allowed")),
+    email: z.string().email("Please enter correct email address"),
+    phoneNumber: z
+      .string()
+      .refine(validator.isMobilePhone, "Please enter correct phone number"),
+    password: z.string().min(6, "Password should be atleast 6 character long"),
+    confirmPassword: z
+      .string()
+      .min(6, "Password should be atleast 6 character long"),
+    accepted: z.literal(true, {
+      errorMap: () => ({
+        message: "Please accept terms and conditions",
+      }),
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Password and Confirm password doesn't match",
+    path: ["password", "confirmPassword"],
+  });
 
 function SignUpForm() {
   const [showPassword, setShowPassword] = useState(false);
