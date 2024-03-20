@@ -1,6 +1,7 @@
 import { Button, Navbar, NavbarContent, NavbarItem } from "@nextui-org/react";
 import Link from "next/link";
 import React from "react";
+import SignInButton from "./signin-button";
 
 function AppBar() {
   return (
@@ -14,9 +15,7 @@ function AppBar() {
       </NavbarContent>
       <NavbarContent justify="end">
         <NavbarItem>
-          <Button as={Link} color="primary" href="/auth/sign-up" variant="flat">
-            Sign Up
-          </Button>
+          <SignInButton />
         </NavbarItem>
       </NavbarContent>
     </Navbar>
