@@ -7,6 +7,7 @@ import {
   PhoneIcon,
   UserCircleIcon,
 } from "@heroicons/react/16/solid";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Checkbox, Input } from "@nextui-org/react";
 import React, { useState } from "react";
 import { useForm ,SubmitHandler, Controller} from "react-hook-form";
@@ -41,14 +42,16 @@ const formSchema = z
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Password and Confirm password doesn't match",
-    path: ["password", "confirmPassword"],
+    path: ["confirmPassword"],
   });
 
 
   type inputType = z.infer<typeof formSchema>
 
 function SignUpForm() {
-  const{register,handleSubmit,reset,control} = useForm<inputType>()
+  const{register,handleSubmit,reset,control,formState:{errors}} = useForm<inputType>({
+    resolver:zodResolver(formSchema)
+  })
   const [showPassword, setShowPassword] = useState(false);
   const showPasswordHandler = () => {
     setShowPassword((prev) => !prev);
@@ -62,27 +65,32 @@ function SignUpForm() {
       <Input
         label="First Name"
         {...register("firstName")}
+        errorMessage={errors.firstName?.message}
         startContent={<UserCircleIcon className="w-4 h-4" />}
       />
       <Input
       {...register("lastName")}
         label="Last Name"
+        errorMessage={errors.lastName?.message}
         startContent={<UserCircleIcon className="w-4 h-4" />}
       />
       <Input
       {...register("phoneNumber")}
+      errorMessage={errors.phoneNumber?.message}
         label="Phone number"
         startContent={<PhoneIcon className="w-4 h-4" />}
       />
       <Input
       {...register("email")}
         label="Email"
+        errorMessage={errors.email?.message}
         startContent={<EnvelopeIcon className="w-4 h-4" />}
         type="email"
       />
       <Input
       {...register("password")}
         label="Password"
+        errorMessage={errors.password?.message}
         startContent={<KeyIcon className="w-4 h-4" />}
         type={showPassword ? "text" : "password"}
         endContent={
@@ -102,15 +110,20 @@ function SignUpForm() {
       <Input
       {...register("confirmPassword")}
         label="Confirm Password"
+        errorMessage={errors.confirmPassword?.message}
         startContent={<KeyIcon className="w-4 h-4" />}
         type={showPassword ? "text" : "password"}
       />
 
       
-      <Controller control={control} name="accepted" render={({field})=>(
+      <Controller control={control} name="accepted"  render={({field})=>(
 
-        <Checkbox onChange={field.onChange} onBlur={field.onBlur}>I accept the terms and condition</Checkbox>
+        <Checkbox onChange={field.onChange}  onBlur={field.onBlur}>I accept the terms and condition</Checkbox>
       )} />
+
+      {
+        !!errors.accepted && (<p className="text-red-600">{errors.accepted.message}</p>)
+      }
 
       <Button type="submit" color="primary">
         Sign Up
