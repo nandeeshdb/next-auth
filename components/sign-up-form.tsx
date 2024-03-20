@@ -9,10 +9,12 @@ import {
 } from "@heroicons/react/16/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Checkbox, Input } from "@nextui-org/react";
-import React, { useState } from "react";
+import { passwordStrength } from "check-password-strength";
+import React, { useEffect, useState } from "react";
 import { useForm ,SubmitHandler, Controller} from "react-hook-form";
 import validator from "validator";
 import { z } from "zod";
+import PasswordStrengthChecker from "./pass-strength-checker";
 
 const formSchema = z
   .object({
@@ -49,10 +51,16 @@ const formSchema = z
   type inputType = z.infer<typeof formSchema>
 
 function SignUpForm() {
-  const{register,handleSubmit,reset,control,formState:{errors}} = useForm<inputType>({
+  const{register,handleSubmit,reset,control,formState:{errors},watch} = useForm<inputType>({
     resolver:zodResolver(formSchema)
   })
   const [showPassword, setShowPassword] = useState(false);
+  const[passStrength,setPassStrength] = useState(0)
+
+    useEffect(()=>{
+        setPassStrength(passwordStrength(watch().password).id)
+
+    },[watch().password])
   const showPasswordHandler = () => {
     setShowPassword((prev) => !prev);
   };
@@ -107,6 +115,7 @@ function SignUpForm() {
           )
         }
       />
+      <PasswordStrengthChecker passwordStrength={passStrength}/>
       <Input
       {...register("confirmPassword")}
         label="Confirm Password"
