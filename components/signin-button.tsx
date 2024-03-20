@@ -12,7 +12,7 @@ function SignInButton() {
         {
             session && session.user ? (
                 <>
-                <p className="text-xl text-sky-400 hover:text-sky-600">{session.user.email}</p>
+                <p className="text-xl text-sky-400 hover:text-sky-600">{session.user.firstName}</p>
                 <Link href='/api/auth/signout'>Sign Out</Link>
                 </>
             ) : (
