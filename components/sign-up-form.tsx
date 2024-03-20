@@ -15,6 +15,8 @@ import { useForm ,SubmitHandler, Controller} from "react-hook-form";
 import validator from "validator";
 import { z } from "zod";
 import PasswordStrengthChecker from "./pass-strength-checker";
+import { registerUser } from "@/lib/actions/auth-actions";
+import { toast } from "react-toastify";
 
 const formSchema = z
   .object({
@@ -22,16 +24,17 @@ const formSchema = z
       .string()
       .min(2, "Atleast 2 cahracters required")
       .max(50, "Only 50characters are allowed")
-      .regex(new RegExp("^[a-zA-Z]$"), "Special Characters are not allowed"),
+      ,
     lastName: z
       .string()
       .min(2, "Atleast 2 cahracters required")
       .max(50, "Only 50characters are allowed")
-      .regex(new RegExp("^[a-zA-Z]$"), "Special Characters are not allowed"),
+      ,
     email: z.string().email("Please enter correct email address"),
-    phoneNumber: z
+    phone: z
       .string()
       .refine(validator.isMobilePhone, "Please enter correct phone number"),
+     
     password: z.string().min(6, "Password should be atleast 6 character long"),
     confirmPassword: z
       .string()
@@ -66,7 +69,18 @@ function SignUpForm() {
   };
 
   const saveUser : SubmitHandler<inputType>=async(data)=>{
-    console.log({data})
+    try {
+      const{accepted,confirmPassword,...user} =data
+      const result = await registerUser(user)
+      toast.success("User created")
+      
+      
+    } catch (error) {
+      console.log(error)
+      toast.error("something went wrong")
+
+      
+    }
   }
   return (
     <form className="flex flex-col w-full px-96 gap-3" onSubmit={handleSubmit(saveUser)}>
@@ -83,8 +97,9 @@ function SignUpForm() {
         startContent={<UserCircleIcon className="w-4 h-4" />}
       />
       <Input
-      {...register("phoneNumber")}
-      errorMessage={errors.phoneNumber?.message}
+      {...register("phone")}
+      
+      errorMessage={errors.phone?.message}
         label="Phone number"
         startContent={<PhoneIcon className="w-4 h-4" />}
       />
